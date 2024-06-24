@@ -2,10 +2,6 @@ package renderer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-//import java.awt.event.KeyAdapter;
-//import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +20,6 @@ public class Main {
 	public static void main(String[] args) {
 		Main m = new Main();
 		m.doStuff();
-//		System.out.println(new GUI().inTriangle(3, 4, new Vector2(2, 3), new Vector2(4, 5), new Vector2(4, 3)));
 		long taskTime = 0;
 		long sleepTime = 1000/frameRate;
 		while (true) {
@@ -117,11 +112,6 @@ public class Main {
 	}
 	
 	void changeDistance() {
-//		for (Triangle t : tris) {
-//			t.v1.z = distanceSlider.getValue();
-//			t.v2.z = distanceSlider.getValue();
-//			t.v3.z = distanceSlider.getValue();
-//		}
 		camera.position.z = distanceSlider.getValue();
 		panel.repaint();
 	}
