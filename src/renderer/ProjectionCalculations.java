@@ -38,20 +38,41 @@ public class ProjectionCalculations {
 		List<Triangle> tris = loadTris();
 		Matrix rotMultiplier = getRotationMultiplier();
 		
+		double minZ = Float.POSITIVE_INFINITY;
+		double maxZ = Float.NEGATIVE_INFINITY;
+		for (Triangle t: tris) {
+			double avZ = 0;
+			for (Vector3 vertex : new Vector3[] {t.v1, t.v2, t.v3}) {
+				Vector3 localVertex = rotMultiplier.transform(vertex.subtract(Main.camera.position));
+				avZ += Math.abs(localVertex.z);
+			}
+			avZ = avZ/3;
+			
+			minZ = Math.min(avZ, minZ);
+			maxZ = Math.max(avZ, maxZ);
+		}
+		
+		maxZ += minZ;
+				
+		HashMap<Vector2[], Color> projectedTris = new HashMap<Vector2[], Color>();
 		for (Triangle t : tris) {
 			Vector3[] vertices = new Vector3[] {t.v1, t.v2, t.v3};
+			Vector2[] trianglePoints = new Vector2[vertices.length];
+			
 			for (int i = 0; i < vertices.length; i++) {
 				Vector3 vertexRelative = rotMultiplier.transform(vertices[i].subtract(Main.camera.position));
 				int nextIndex = i < vertices.length - 1 ? i + 1 : 0;
 				Vector3 nextVertexRelative = rotMultiplier.transform(vertices[nextIndex].subtract(Main.camera.position));
-
-				Vector3[] splitPoints = pointSplit(vertexRelative, nextVertexRelative, 5);
 				
+				Vector3[] splitPoints = pointSplit(vertexRelative, nextVertexRelative, (int) Math.max((maxZ * 2)/vertexRelative.z, 20));
+								
 				for (int splitIndex = 0; splitIndex < splitPoints.length - 1; splitIndex++) {
-					if (!inPyramid(splitPoints[splitIndex + 1])) continue;
+					if (!inPyramid(splitPoints[splitIndex + 1]) || !inPyramid(splitPoints[splitIndex])) continue;
 					
 					Vector2 projectionA = projection2D(e, splitPoints[splitIndex]);
 					Vector2 projectionB = projection2D(e, splitPoints[splitIndex + 1]);
+					
+					trianglePoints[i] = projectionA;
 					
 					Vector2[] pointsTuple = new Vector2[] {projectionA, projectionB};
 					
@@ -61,6 +82,7 @@ public class ProjectionCalculations {
 					}
 				}
 			}
+			projectedTris.put(trianglePoints, t.color);
 		}
 		return result;
 	}

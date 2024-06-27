@@ -8,6 +8,16 @@ public class Vector3 {
 		this.z = z;
 	}
 	
+	Vector3(Vector3 original) {
+		this.x = original.x;
+		this.y = original.y;
+		this.z = original.z;
+	}
+	
+	public Vector3 clone() {
+		return new Vector3(this.x, this.y, this.z);
+	}
+	
 	public Vector3 subtract(Vector3 v2) {
 		return new Vector3(this.x - v2.x, this.y - v2.y, this.z - v2.z);
 	}

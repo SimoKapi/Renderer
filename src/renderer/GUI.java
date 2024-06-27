@@ -26,7 +26,6 @@ public class GUI extends JPanel {
 	private static JLabel label, resolutionLabel;
 	
 	void Update() {
-		Main.camera.rotation.y = ySlider.getValue();
 		label.setText("Rotation: " + Main.camera.rotation.toString() + " Position: " + Main.camera.position.toString());
 		repaint();
 //		resolutionLabel.setText(getWidth() + "x" + getHeight());
