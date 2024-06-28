@@ -2,10 +2,11 @@ package renderer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
@@ -36,6 +37,12 @@ public class GUI extends JPanel {
 		frame = new JFrame("Renderer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
+		
+//		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+//		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+//			    cursorImg, new Point(0, 0), "blank cursor");
+//		frame.getContentPane().setCursor(blankCursor);
+
 		
 		distanceSlider = new JSlider(SwingConstants.VERTICAL, -100, 100, 0);
 		frame.add(distanceSlider, BorderLayout.WEST);

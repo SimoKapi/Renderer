@@ -46,7 +46,7 @@ public class STL_Loader {
 		    		i++;
 		    	}
 		    	int rnd = new Random().nextInt(colors.length);
-		    	tris.add(new Triangle(triPoints[0], triPoints[1], triPoints[2], colors[rnd]));
+		    	tris.add(new Triangle(triPoints[0], triPoints[1], triPoints[2], Color.RED));
 		    }
 		} catch (IOException e) {
 			e.printStackTrace();

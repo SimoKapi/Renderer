@@ -1,6 +1,5 @@
 package renderer;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,29 +17,55 @@ public class Main {
 	static CameraRotation cameraRotation = new CameraRotation();
 	static STL_Loader stlLoader = new STL_Loader();
 	public static long updateTime;
+	public static Vector3 inputAxis = new Vector3(0, 0, 0);
 		
-	static String inputFile = "/Users/simo/desktop/sphere.stl";
+	static String inputFile = "/Users/simo/desktop/intersect.stl";
 	
 	public static void main(String[] args) {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
 			@Override
 			public boolean dispatchKeyEvent(KeyEvent e) {
-				Vector2 inputAxis = new Vector2(0, 0);
 				switch (e.getID()) {
 				case KeyEvent.KEY_PRESSED:
 					if (e.getKeyCode() == KeyEvent.VK_W) {
-						inputAxis.y += 1;
+						Main.inputAxis.z = 1;
 					}
 					if (e.getKeyCode() == KeyEvent.VK_S) {
-						inputAxis.y -= 1;
+						Main.inputAxis.z = -1;
 					}
 					if (e.getKeyCode() == KeyEvent.VK_A) {
-						inputAxis.x -= 1;
+						Main.inputAxis.x = -1;
 					}
 					if (e.getKeyCode() == KeyEvent.VK_D) {
-						inputAxis.x += 1;
+						Main.inputAxis.x = 1;
 					} 
-					cameraMovement.move(inputAxis);
+					if (e.getKeyCode() == KeyEvent.VK_E) {
+						Main.inputAxis.y = 1;
+					}
+					if (e.getKeyCode() == KeyEvent.VK_Q) {
+						Main.inputAxis.y = -1;
+					} 
+					break;
+					
+				case KeyEvent.KEY_RELEASED:
+					if (e.getKeyCode() == KeyEvent.VK_W) {
+						Main.inputAxis.z = 0;
+					}
+					if (e.getKeyCode() == KeyEvent.VK_S) {
+						Main.inputAxis.z = 0;
+					}
+					if (e.getKeyCode() == KeyEvent.VK_A) {
+						Main.inputAxis.x = 0;
+					}
+					if (e.getKeyCode() == KeyEvent.VK_D) {
+						Main.inputAxis.x = 0;
+					} 
+					if (e.getKeyCode() == KeyEvent.VK_E) {
+						Main.inputAxis.y = 0;
+					}
+					if (e.getKeyCode() == KeyEvent.VK_Q) {
+						Main.inputAxis.y = 0;
+					} 
 					break;
 				}
 				return false;
@@ -56,19 +81,19 @@ public class Main {
 		long taskTime = 0;
 		long sleepTime = 1000/frameRate;
 		while (true) {
-		  taskTime = System.currentTimeMillis();
-		  panel.Update();
-		  cameraRotation.Update();
-		  cameraMovement.Update();
-		  taskTime = System.currentTimeMillis()-taskTime;
-		  updateTime = taskTime;
-		  if (sleepTime-taskTime > 0 ) {
-		    try {
-				Thread.sleep(sleepTime-taskTime);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			cameraMovement.move(inputAxis);
+			taskTime = System.currentTimeMillis();
+			panel.Update();
+			cameraRotation.Update();
+			taskTime = System.currentTimeMillis()-taskTime;
+			updateTime = taskTime;
+			if (sleepTime-taskTime > 0 ) {
+				try {
+					Thread.sleep(sleepTime-taskTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
-		  }
 		}
 	}
 		

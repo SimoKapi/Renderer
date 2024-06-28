@@ -1,11 +1,7 @@
 package renderer;
-import java.awt.event.KeyListener;
 
-public class CameraMovement {
-	public void Update() {
-//		Vector3 forwardVector = getForwardVector();
-//		Main.camera.position = Main.camera.position.add(forwardVector.multiply(0.1));
-	}
+public class CameraMovement {	
+	public double speed = 0.25;
 	
 	Vector3 getForwardVector() {
 		Vector3 forwardVector = new Vector3(0, 0, 0);
@@ -21,6 +17,19 @@ public class CameraMovement {
 	Vector3 getRightVector() {
 		Vector3 rightVector = new Vector3(0, 0, 0);
 		Vector3 cameraRotation = Main.camera.rotation.clone();
+		cameraRotation.y += 90;
+		
+		rightVector.x = Math.cos(Math.toRadians(cameraRotation.z)) * Math.sin(Math.toRadians(cameraRotation.y));
+		rightVector.y = -Math.sin(Math.toRadians(cameraRotation.z));
+		rightVector.z = Math.cos(Math.toRadians(cameraRotation.z)) * Math.cos(Math.toRadians(cameraRotation.y));
+				
+		return rightVector;
+	}
+	
+	Vector3 getUpVector() {
+		Vector3 rightVector = new Vector3(0, 0, 0);
+		Vector3 cameraRotation = Main.camera.rotation.clone();
+		cameraRotation.x += 90;
 		
 		rightVector.x = Math.cos(Math.toRadians(cameraRotation.x)) * Math.sin(Math.toRadians(cameraRotation.y));
 		rightVector.y = -Math.sin(Math.toRadians(cameraRotation.x));
@@ -28,16 +37,17 @@ public class CameraMovement {
 				
 		return rightVector;
 	}
-	
-	Vector3 getUpVector(Vector3 forwardVector) {
-		return new Vector3(forwardVector.x, -forwardVector.z, forwardVector.y);
-	}
-	
-	public void move(Vector2 inputAxis) {
+
+		
+	public void move(Vector3 inputAxis) {
 		Vector3 forwardVector = getForwardVector();
 		Vector3 rightVector = getRightVector();
+		Vector3 upVector = getUpVector();
 		
-		Main.camera.position = Main.camera.position.add(forwardVector.multiply(inputAxis.y));
-		Main.camera.position = Main.camera.position.add(rightVector.multiply(inputAxis.x));
+		for (int i = 0; i < 10; i++) {
+			Main.camera.position = Main.camera.position.add(forwardVector.multiply(speed * inputAxis.z/10));
+			Main.camera.position = Main.camera.position.add(rightVector.multiply(speed * inputAxis.x/10));
+			Main.camera.position = Main.camera.position.add(upVector.multiply(speed * inputAxis.y/10));
+		}
 	}
 }

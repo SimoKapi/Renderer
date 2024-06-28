@@ -1,6 +1,6 @@
 package renderer;
 import java.awt.MouseInfo;
-import java.awt.PointerInfo;
+import java.awt.event.MouseEvent;
 import java.awt.Point;
 
 public class CameraRotation {
@@ -15,6 +15,10 @@ public class CameraRotation {
 				Vector2 diff = mousePosition.subtract(previousMousePosition);
 				Main.camera.rotation.x -= diff.y * sensitivity;
 				Main.camera.rotation.y += diff.x * sensitivity;
+				
+				while (Main.camera.rotation.x > 360) Main.camera.rotation.x -= 360;
+				while (Main.camera.rotation.y > 360) Main.camera.rotation.y -= 360;
+				
 				previousMousePosition = mousePosition;
 				return;
 			} else {
@@ -25,4 +29,19 @@ public class CameraRotation {
 			
 		}
 	}
+	
+	boolean mouseDown = false;
+
+	public void mousePressed(MouseEvent e) {
+	    if (e.getButton() == MouseEvent.BUTTON1) {
+	        mouseDown = true;
+	    }
+	}
+
+	public void mouseReleased(MouseEvent e) {
+	    if (e.getButton() == MouseEvent.BUTTON1) {
+	        mouseDown = false;
+	    }
+	}
+
 }

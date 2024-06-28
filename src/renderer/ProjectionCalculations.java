@@ -1,7 +1,6 @@
 package renderer;
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.awt.Color;
 
@@ -38,7 +37,6 @@ public class ProjectionCalculations {
 		List<Triangle> tris = loadTris();
 		Matrix rotMultiplier = getRotationMultiplier();
 		
-		double minZ = Float.POSITIVE_INFINITY;
 		double maxZ = Float.NEGATIVE_INFINITY;
 		for (Triangle t: tris) {
 			double avZ = 0;
@@ -48,12 +46,9 @@ public class ProjectionCalculations {
 			}
 			avZ = avZ/3;
 			
-			minZ = Math.min(avZ, minZ);
 			maxZ = Math.max(avZ, maxZ);
 		}
 		
-		maxZ += minZ;
-				
 		HashMap<Vector2[], Color> projectedTris = new HashMap<Vector2[], Color>();
 		for (Triangle t : tris) {
 			Vector3[] vertices = new Vector3[] {t.v1, t.v2, t.v3};
@@ -64,7 +59,7 @@ public class ProjectionCalculations {
 				int nextIndex = i < vertices.length - 1 ? i + 1 : 0;
 				Vector3 nextVertexRelative = rotMultiplier.transform(vertices[nextIndex].subtract(Main.camera.position));
 				
-				Vector3[] splitPoints = pointSplit(vertexRelative, nextVertexRelative, (int) Math.max((maxZ * 2)/vertexRelative.z, 20));
+				Vector3[] splitPoints = pointSplit(vertexRelative, nextVertexRelative, (int) Math.round(Math.max((maxZ * 2)/vertexRelative.z, 20)));
 								
 				for (int splitIndex = 0; splitIndex < splitPoints.length - 1; splitIndex++) {
 					if (!inPyramid(splitPoints[splitIndex + 1]) || !inPyramid(splitPoints[splitIndex])) continue;
