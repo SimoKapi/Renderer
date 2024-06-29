@@ -30,5 +30,9 @@ public class Vector2 {
 	public double multiply(Vector2 v2) {
 		return (this.x * v2.x + this.y * v2.y);
 	}
+	
+	public double size() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
 
 }

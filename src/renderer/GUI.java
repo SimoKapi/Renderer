@@ -2,11 +2,8 @@ package renderer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
@@ -43,17 +40,6 @@ public class GUI extends JPanel {
 //			    cursorImg, new Point(0, 0), "blank cursor");
 //		frame.getContentPane().setCursor(blankCursor);
 
-		
-		distanceSlider = new JSlider(SwingConstants.VERTICAL, -100, 100, 0);
-		frame.add(distanceSlider, BorderLayout.WEST);
-        ySlider = new JSlider(-180, 180, 0);
-        frame.add(ySlider, BorderLayout.SOUTH);
-        FOVSlider = new JSlider(SwingConstants.VERTICAL, 0, 200, 20);
-        frame.add(FOVSlider, BorderLayout.EAST);
-		
-
-		distanceSlider.addChangeListener(e -> Main.changeDistance(distanceSlider.getValue()));
-		FOVSlider.addChangeListener(e -> Main.changeFOV(FOVSlider.getValue()));
 		frame.add(this);
 		
 		JPanel infoPanel = new JPanel();
@@ -84,14 +70,22 @@ public class GUI extends JPanel {
 		
 		try {
 			HashMap<Vector2[], Color> points = projectionCalculations.getFinalImage();
+			HashMap<Vector2, Color> pointsCollection = projectionCalculations.getPointsCollection();
 			
-			for (Vector2[] key : points.keySet()) {
-				g2d.setColor(points.get(key));
-				g2d.drawLine((int) key[0].x, (int) key[0].y, (int) key[1].x, (int) key[1].y);
+			for (Vector2 point : pointsCollection.keySet()) {
+				g2d.setColor(pointsCollection.get(point));
+				g2d.drawRect((int) point.x, (int) point.y, 1, 1);
 			}
+			
+//			for (Vector2[] key : points.keySet()) {
+//				g2d.setColor(points.get(key));
+//				g2d.drawLine((int) key[0].x, (int) key[0].y, (int) key[1].x, (int) key[1].y);
+//			}
 	
 			g2d.drawImage(img, 0, 0, null);
 		} catch(Exception e) {}
+		
+		Main.lateUpdate();
 	}
 			
 	public Vector3 convert(Matrix in) {

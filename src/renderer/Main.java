@@ -19,7 +19,7 @@ public class Main {
 	public static long updateTime;
 	public static Vector3 inputAxis = new Vector3(0, 0, 0);
 		
-	static String inputFile = "/Users/simo/desktop/intersect.stl";
+	static String inputFile = "/Users/simo/desktop/test3.stl";
 	
 	public static void main(String[] args) {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
@@ -81,10 +81,8 @@ public class Main {
 		long taskTime = 0;
 		long sleepTime = 1000/frameRate;
 		while (true) {
-			cameraMovement.move(inputAxis);
 			taskTime = System.currentTimeMillis();
 			panel.Update();
-			cameraRotation.Update();
 			taskTime = System.currentTimeMillis()-taskTime;
 			updateTime = taskTime;
 			if (sleepTime-taskTime > 0 ) {
@@ -95,6 +93,11 @@ public class Main {
 				}
 			}
 		}
+	}
+	
+	public static void lateUpdate() {
+		cameraRotation.Update();
+		cameraMovement.move(inputAxis);		
 	}
 		
 	public static void changeFOV(double value) {

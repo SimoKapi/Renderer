@@ -34,7 +34,7 @@ public class STL_Loader {
 		    	index = content.indexOf("vertex", index + 1);
 		    }
 		    
-		    for (int i = 0; i < indexes.size() - 3; i += 0) {
+		    for (int i = 0; i < indexes.size(); i += 0) {
 		    	Vector3[] triPoints = new Vector3[3];
 		    	for (int counter = 0; counter < 3; counter++) {
 		    		String vertex = content.substring(indexes.get(i), content.indexOf('\n', indexes.get(i)));
@@ -46,7 +46,7 @@ public class STL_Loader {
 		    		i++;
 		    	}
 		    	int rnd = new Random().nextInt(colors.length);
-		    	tris.add(new Triangle(triPoints[0], triPoints[1], triPoints[2], Color.RED));
+		    	tris.add(new Triangle(triPoints[0], triPoints[1], triPoints[2], colors[rnd]));
 		    }
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -44,11 +44,19 @@ public class Vector3 {
 		return new String(x + ", " + y + ", " + z);
 	}
 	
+	public static Vector3 median(Vector3 v1, Vector3 v2) {
+		return new Vector3((v1.x + v2.x)/2, (v1.y + v2.y)/2, (v1.z + v2.z)/2);
+	}
+	
 	public static double distance(Vector3 first, Vector3 second) {
 		return (double) Math.sqrt(Math.pow(second.x - first.x, 2) + Math.pow(second.y - first.y, 2) + Math.pow(second.z - first.z, 2));
 	}
 	
 	public static Vector3 vector(Vector3 first, Vector3 second) {
 		return new Vector3(second.x - first.x, second.y - first.y, second.z - first.z);
+	}
+	
+	public double size() {
+		return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2) + Math.pow(this.z, 2));
 	}
 }

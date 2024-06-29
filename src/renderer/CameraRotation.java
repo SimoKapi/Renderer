@@ -5,7 +5,7 @@ import java.awt.Point;
 
 public class CameraRotation {
 	Vector2 previousMousePosition;
-	double sensitivity = 0.5;
+	double sensitivity = 1;
 	public void Update() {
 		try {
 			Point point = MouseInfo.getPointerInfo().getLocation();
