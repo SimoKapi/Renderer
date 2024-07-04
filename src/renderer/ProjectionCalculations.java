@@ -7,10 +7,10 @@ import java.awt.Color;
 
 public class ProjectionCalculations {
 	Vector3 e;
-	HashMap<Vector2, Double> zBuffer;
 	HashMap<Vector2, Color> pointsCollection;
+	public Color[][] currentView;
 	int screenWidth, screenHeight;
-	
+		
 	public List<Triangle> loadTris() {
 		return Main.tris;
 	}
@@ -18,6 +18,7 @@ public class ProjectionCalculations {
 	public void initializeValues(int screenWidth, int screenHeight) {
 		this.screenWidth = screenWidth;
 		this.screenHeight = screenHeight;
+		currentView = new Color[screenHeight][screenWidth];
 	}
 	
 	public Matrix getRotationMultiplier() {
@@ -32,24 +33,19 @@ public class ProjectionCalculations {
 	
 	public HashMap<Vector2[], Color> getFinalImage() {
 		e = new Vector3(0, 0, screenWidth/Math.toDegrees(Math.tan(Math.toRadians(Main.FOV/2))));
-		
+		currentView = new Color[screenHeight][screenWidth];
 		HashMap<Vector2[], Color> result = new HashMap<Vector2[], Color>();
 		pointsCollection = new HashMap<Vector2, Color>();
-		zBuffer = new HashMap<Vector2, Double>();
 		
 		List<Triangle> tris = loadTris();
 		Matrix rotMultiplier = getRotationMultiplier();
 		
 		double maxDepth = Float.NEGATIVE_INFINITY;
 		for (Triangle t: tris) {
-			double avZ = 0;
 			for (Vector3 vertex : new Vector3[] {t.v1, t.v2, t.v3}) {
-				Vector3 localVertex = rotMultiplier.transform(vertex.subtract(Main.camera.position));
-				avZ += Math.abs(localVertex.z);
+				Vector3 localVertex = rotMultiplier.transform(vertex.subtract(Main.camera.position));;
+				maxDepth = Math.max(localVertex.z, maxDepth);
 			}
-			avZ = avZ/3;
-			
-			maxDepth = Math.max(avZ, maxDepth);
 		}
 		
 		HashMap<List<Vector3>, Color> projectedTris = new HashMap<List<Vector3>, Color>();
@@ -58,7 +54,9 @@ public class ProjectionCalculations {
 					rotMultiplier.transform(t.v2.subtract(Main.camera.position)),
 					rotMultiplier.transform(t.v3.subtract(Main.camera.position)),};
 			
-			if (!normalFacingCamera(localVertices)) continue;
+			if (!normalFacingCamera(localVertices)) {
+				continue;
+			}
 			
 			List<Vector3> trianglePoints = new ArrayList<Vector3>();
 			
@@ -66,37 +64,66 @@ public class ProjectionCalculations {
 				Vector3 vertexRelative = localVertices[i];
 				int nextIndex = i < localVertices.length - 1 ? i + 1 : 0;
 				Vector3 nextVertexRelative = localVertices[nextIndex];
-				
-				Vector3[] splitPoints = pointSplit(vertexRelative, nextVertexRelative, (int) Math.round(Math.max((maxDepth * 2)/vertexRelative.z, 200)));
-				
-				if (!inPyramid(splitPoints[0]) || !inPyramid(splitPoints[1])) continue;
-					
-				Vector2 projectionA = projection2D(e, splitPoints[0]);
-				Vector2 projectionB = projection2D(e, splitPoints[1]);
+				if (vertexRelative.z < 0 && nextVertexRelative.z < 0) {
+					continue;
+				}
 								
-//				Vector2 projectionA = projection2D(e, vertexRelative);
-//				Vector2 projectionB = projection2D(e, nextVertexRelative);
-								
-				Vector3 additionA = new Vector3(projectionA.x, projectionA.y, splitPoints[0].z);
-				Vector3 additionB = new Vector3(projectionB.x, projectionB.y, splitPoints[1].z);
-
-//				Vector3 additionA = new Vector3(projectionA.x, projectionA.y, vertexRelative.z);
-//				Vector3 additionB = new Vector3(projectionB.x, projectionB.y, nextVertexRelative.z);
+				Vector3 clippedVertexRelative = clipToZ(nextVertexRelative, vertexRelative);
+				Vector3 clippedNextVertexRelative = clipToZ(vertexRelative, nextVertexRelative);
 				
-				trianglePoints.add(additionA);
-				trianglePoints.add(additionB);
-
-				Vector2[] pointsTuple = new Vector2[] {projectionA, projectionB};
+				Vector3[] splitPoints;
+				
+				if (vertexRelative.z > 0) {
+					splitPoints = new Vector3[] {clippedNextVertexRelative};
+				} else {
+					splitPoints = new Vector3[] {clippedVertexRelative, clippedNextVertexRelative};
+				}
+				
+//				Vector3[] splitPoints = pointSplit(vertexRelative, nextVertexRelative, (int) Math.round(Math.max((maxDepth * 2)/vertexRelative.z, 200)));
+				for (int pointIndex = 0; pointIndex < splitPoints.length; pointIndex++) {
+					Vector2 projection = projection2D(e, splitPoints[pointIndex]);
+					int nextPoint = i < splitPoints.length - 1 ? i + 1 : 0;
+					Vector2 nextProjection = projection2D(e, splitPoints[nextPoint]);
+					Vector3 addition = new Vector3(projection.x, projection.y, nextVertexRelative.z);
 					
-				result.put(pointsTuple, t.color);
+					Boolean containsAddition = false;
+					for (Vector3 point : trianglePoints) {
+						if (Vector3.isEqual(point,  addition)) containsAddition = true;
+					}
+					if (!containsAddition) trianglePoints.add(addition);
+						
+					Vector2[] pointsTuple = new Vector2[] {projection, nextProjection};
+					result.put(pointsTuple,  t.color);
+				}
 			}
+			System.out.println(trianglePoints.size());
 			projectedTris.put(trianglePoints, t.color);
 		}
 		pointsCollection = calculateRenderPoints(projectedTris);
 		return result;
 	}
 	
-	Boolean normalFacingCamera(Vector3[] corners) {
+	Vector3 clipToZ(Vector3 v1, Vector3 v2) {
+		if (v2.z > 0) return v2;
+		Vector3 directional = v2.subtract(v1);
+		double multiplier = v1.z/Math.abs(directional.z);
+		
+		Vector3 result = v1.add(directional.multiply(multiplier));
+		result.z += 0.00001;
+		
+		return result;
+	}
+			
+	Boolean normalFacingCamera(Vector3[] corners) {		
+		Vector3 normal = getNormalVector(corners);
+		
+		Vector3 vertex = corners[0];
+		double dot_product = normal.multiply(vertex);
+		
+		return dot_product < 0;
+	}
+	
+	Vector3 getNormalVector(Vector3[] corners) {
 		Vector3 v1 = corners[1].subtract(corners[0]);
 		Vector3 v2 = corners[2].subtract(corners[0]);
 		
@@ -105,17 +132,12 @@ public class ProjectionCalculations {
 		double Nz = v1.x * v2.y - v1.y * v2.x;
 		
 		Vector3 normal = new Vector3(Nx, Ny, Nz);
-		
-		Vector3 vertex = corners[0];
-		double dot_product = normal.multiply(vertex);
-		System.out.println(dot_product);
-		
-		return dot_product < 0;
+		return normal;
 	}
 	
 	HashMap<Vector2, Color> calculateRenderPoints(HashMap<List<Vector3>, Color> projectedTris) {
-		int scaler = 2;
-		HashMap<Vector2, Double> depthPoints = new HashMap<Vector2, Double>();
+		int scaler = 1;
+		Double[][] depthPoints = new Double[screenHeight][screenWidth];
 		HashMap<Vector2, Color> renderPoints = new HashMap<Vector2, Color>();
 		
 		for (List<Vector3> corners : projectedTris.keySet()) {
@@ -143,12 +165,18 @@ public class ProjectionCalculations {
 				for (int y = minY; y < maxY; y+=scaler) {
 					Vector2 xyVector = new Vector2(x, y);
 					if (!inPolygon(flatCorners, xyVector)) continue;
-					Double currentEntry = depthPoints.get(xyVector);
-					if (currentEntry == null || currentEntry > depth) {
-						for (int i = 0; i < scaler; i++) {	
-							Vector2 newVector = new Vector2(x + i, y + i);
-							depthPoints.put(newVector, depth);
-							renderPoints.put(newVector, projectedTris.get(corners));
+					Double currentEntry = depthPoints[y][x];
+					if ((currentEntry == null || currentEntry > depth) && inPyramid(new Vector3(x - screenWidth/2, y - screenHeight/2, e.z))) {
+//					if ((currentEntry == null || currentEntry > depth)) {
+						for (int i = 0; i < scaler; i++) {
+							for (int j = 0; j < scaler; j++) {						
+								try {									
+									depthPoints[y + i][x + j] = depth;
+									currentView[y + i][x + j] = projectedTris.get(corners);
+								} catch (Exception e) {
+									
+								}
+							}
 						}
 					}
 				}
@@ -156,31 +184,16 @@ public class ProjectionCalculations {
 		}
 		return renderPoints;
 	}
-	
+		
 	public HashMap<Vector2, Color> getPointsCollection() {
 		return pointsCollection;
 	}
-		
-	public HashMap<Vector2, Double> getZBuffer() {
-		return zBuffer;
-	}
-	
-	void addToZBuffer(Vector2 point, double depth) {
-		if (zBuffer.get(point) == null || zBuffer.get(point) > depth) {
-			zBuffer.put(point, depth);
-		}
-	}
-	
-	void addToZBuffer(Vector2 point, double depth, Color color) {
-		if (zBuffer.get(point) == null || zBuffer.get(point) > depth) {
-			zBuffer.put(point, depth);
-			pointsCollection.put(point, color);
-		}
-	}
 	
 	public Vector3[] pointSplit(Vector3 v1, Vector3 v2, int segmentCount) {
-		Vector3 vector = v2.subtract(v1);
 		Vector3[] result = new Vector3[] {v1, v2};
+		if (inPyramid(v1) && inPyramid(v2)) return result;
+				
+		Vector3 vector = v2.subtract(v1);
 				
 		for (int i = 1; i < segmentCount + 1; i++) {
 			Vector3 newPoint = v1.add(vector.divide(segmentCount).multiply(i));
@@ -192,7 +205,6 @@ public class ProjectionCalculations {
 				}
 			}
 		}
-		
 		return result;
 	}
 	
@@ -227,6 +239,10 @@ public class ProjectionCalculations {
 		return (Math.abs(triArea - (area1 + area2 + area3)) < 0.1);
 	}
 	
+	public Boolean inTriangle(Vector2 point, Vector2[] vertices) {
+		return inTriangle(point, vertices[0], vertices[1], vertices[2]);
+	}
+	
 	float area(Vector2 t1, Vector2 t2, Vector2 t3) {
 		return (float) Math.abs((t1.x * (t2.y - t3.y) + t2.x * (t3.y - t1.y) + t3.x * (t1.y - t2.y))/2);
 	}
@@ -236,7 +252,7 @@ public class ProjectionCalculations {
 		double y = (e.z/d.z)*d.y + e.y;
 		
 		return new Vector2(x += screenWidth/2, y += screenHeight/2);
-			}
+	}
 	
 	public Matrix rotX(double val) {
 		return new Matrix(new double[][] {

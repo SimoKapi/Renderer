@@ -8,7 +8,7 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 
 public class Main {
-	public static int frameRate = 100;
+	public static int frameRate = 50;
 	public static double FOV = 10;
 	static List<Triangle> tris = new ArrayList<Triangle>();
 	public static Camera camera = new Camera(new Vector3(0, 0, -10), Vector3.zero, new Vector2(1920, 1080));
@@ -16,7 +16,7 @@ public class Main {
 	static CameraMovement cameraMovement = new CameraMovement();
 	static CameraRotation cameraRotation = new CameraRotation();
 	static STL_Loader stlLoader = new STL_Loader();
-	public static long updateTime;
+	public static long deltaTime;
 	public static Vector3 inputAxis = new Vector3(0, 0, 0);
 		
 	static String inputFile = "/Users/simo/desktop/test3.stl";
@@ -84,7 +84,7 @@ public class Main {
 			taskTime = System.currentTimeMillis();
 			panel.Update();
 			taskTime = System.currentTimeMillis()-taskTime;
-			updateTime = taskTime;
+			deltaTime = taskTime;
 			if (sleepTime-taskTime > 0 ) {
 				try {
 					Thread.sleep(sleepTime-taskTime);

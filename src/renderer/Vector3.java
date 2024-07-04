@@ -38,10 +38,18 @@ public class Vector3 {
 		return (this.x * v2.x + this.y * v2.y + this.z * v2.z);
 	}
 	
+	public Vector3 round() {
+		return new Vector3(Math.round(this.x), Math.round(this.y), Math.round(this.z));
+	}
+	
 	public static Vector3 zero = new Vector3(0, 0, 0);
 	
 	public String toString() {
 		return new String(x + ", " + y + ", " + z);
+	}
+	
+	public static Boolean isEqual(Vector3 v1, Vector3 v2) {
+		return Math.round(v1.x) == Math.round(v2.x) && Math.round(v1.y) == Math.round(v2.y) && Math.round(v1.z) == Math.round(v2.z);
 	}
 	
 	public static Vector3 median(Vector3 v1, Vector3 v2) {

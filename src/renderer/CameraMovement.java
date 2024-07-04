@@ -1,7 +1,7 @@
 package renderer;
 
 public class CameraMovement {	
-	public double speed = 0.25;
+	public double speed = 1;
 	
 	Vector3 getForwardVector() {
 		Vector3 forwardVector = new Vector3(0, 0, 0);
@@ -45,6 +45,9 @@ public class CameraMovement {
 		Vector3 upVector = getUpVector();
 		
 		for (int i = 0; i < 10; i++) {
+//			Main.camera.position = Main.camera.position.add(forwardVector.multiply(Main.deltaTime * speed * inputAxis.z/10));
+//			Main.camera.position = Main.camera.position.add(rightVector.multiply(Main.deltaTime * speed * inputAxis.x/10));
+//			Main.camera.position = Main.camera.position.add(upVector.multiply(Main.deltaTime * speed * inputAxis.y/10));
 			Main.camera.position = Main.camera.position.add(forwardVector.multiply(speed * inputAxis.z/10));
 			Main.camera.position = Main.camera.position.add(rightVector.multiply(speed * inputAxis.x/10));
 			Main.camera.position = Main.camera.position.add(upVector.multiply(speed * inputAxis.y/10));

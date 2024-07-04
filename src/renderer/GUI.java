@@ -55,32 +55,41 @@ public class GUI extends JPanel {
 		frame.add(infoPanel, BorderLayout.NORTH);
 		frame.setSize((int) Main.camera.resolution.x, (int) Main.camera.resolution.y);
 		frame.setVisible(true);
+		
+//		projectionCalculations.start();
 	}
 	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		projectionCalculations.initializeValues(getWidth(), getHeight());
 		g2d = (Graphics2D) g;
 		g2d.setColor(Color.DARK_GRAY);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 				
 		BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
 		
-		projectionCalculations.initializeValues(getWidth(), getHeight());
-		
 		try {
 			HashMap<Vector2[], Color> points = projectionCalculations.getFinalImage();
-			HashMap<Vector2, Color> pointsCollection = projectionCalculations.getPointsCollection();
+//			HashMap<Vector2, Color> pointsCollection = projectionCalculations.getPointsCollection();
 			
-			for (Vector2 point : pointsCollection.keySet()) {
-				g2d.setColor(pointsCollection.get(point));
-				g2d.drawRect((int) point.x, (int) point.y, 1, 1);
+			for (int y = 0; y < projectionCalculations.currentView.length - 1; y++) {
+				for (int x = 0; x < projectionCalculations.currentView[y].length - 1; x++) {
+					if (projectionCalculations.currentView[y][x] != null) {						
+						img.setRGB(x, y, projectionCalculations.currentView[y][x].getRGB());
+					}
+				}
 			}
 			
-//			for (Vector2[] key : points.keySet()) {
-//				g2d.setColor(points.get(key));
-//				g2d.drawLine((int) key[0].x, (int) key[0].y, (int) key[1].x, (int) key[1].y);
+//			for (Vector2 point : pointsCollection.keySet()) {
+//				g2d.setColor(pointsCollection.get(point));
+//				g2d.drawRect((int) point.x, (int) point.y, 0, 0);
 //			}
+			
+			for (Vector2[] key : points.keySet()) {
+				g2d.setColor(Color.RED);
+				g2d.drawLine((int) key[0].x, (int) key[0].y, (int) key[1].x, (int) key[1].y);
+			}
 	
 			g2d.drawImage(img, 0, 0, null);
 		} catch(Exception e) {}
