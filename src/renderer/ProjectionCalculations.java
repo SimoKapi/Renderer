@@ -18,7 +18,6 @@ public class ProjectionCalculations {
 	public void initializeValues(int screenWidth, int screenHeight) {
 		this.screenWidth = screenWidth;
 		this.screenHeight = screenHeight;
-		currentView = new Color[screenHeight][screenWidth];
 	}
 	
 	public Matrix getRotationMultiplier() {
@@ -73,18 +72,14 @@ public class ProjectionCalculations {
 				
 				Vector3[] splitPoints;
 				
-				if (vertexRelative.z > 0) {
-					splitPoints = new Vector3[] {clippedNextVertexRelative};
-				} else {
-					splitPoints = new Vector3[] {clippedVertexRelative, clippedNextVertexRelative};
-				}
+				splitPoints = new Vector3[] {clippedVertexRelative, clippedNextVertexRelative};
 				
 //				Vector3[] splitPoints = pointSplit(vertexRelative, nextVertexRelative, (int) Math.round(Math.max((maxDepth * 2)/vertexRelative.z, 200)));
 				for (int pointIndex = 0; pointIndex < splitPoints.length; pointIndex++) {
 					Vector2 projection = projection2D(e, splitPoints[pointIndex]);
 					int nextPoint = i < splitPoints.length - 1 ? i + 1 : 0;
 					Vector2 nextProjection = projection2D(e, splitPoints[nextPoint]);
-					Vector3 addition = new Vector3(projection.x, projection.y, nextVertexRelative.z);
+					Vector3 addition = new Vector3(projection.x, projection.y, splitPoints[pointIndex].z);
 					
 					Boolean containsAddition = false;
 					for (Vector3 point : trianglePoints) {
@@ -93,10 +88,9 @@ public class ProjectionCalculations {
 					if (!containsAddition) trianglePoints.add(addition);
 						
 					Vector2[] pointsTuple = new Vector2[] {projection, nextProjection};
-					result.put(pointsTuple,  t.color);
+					result.put(pointsTuple, t.color);
 				}
 			}
-			System.out.println(trianglePoints.size());
 			projectedTris.put(trianglePoints, t.color);
 		}
 		pointsCollection = calculateRenderPoints(projectedTris);
@@ -136,7 +130,7 @@ public class ProjectionCalculations {
 	}
 	
 	HashMap<Vector2, Color> calculateRenderPoints(HashMap<List<Vector3>, Color> projectedTris) {
-		int scaler = 1;
+//		int scaler = 1;
 		Double[][] depthPoints = new Double[screenHeight][screenWidth];
 		HashMap<Vector2, Color> renderPoints = new HashMap<Vector2, Color>();
 		
@@ -150,34 +144,33 @@ public class ProjectionCalculations {
 			List<Vector2> flatCorners = new ArrayList<Vector2>();
 			
 			double depth = 0;
+			Color col = projectedTris.get(corners);
 			for (Vector3 corner : corners) {
 				flatCorners.add(new Vector2(corner.x, corner.y));
-				minX = (int) Math.round(Math.max(Math.min(corner.x, minX), 0));
-				maxX = (int) Math.round(Math.min(Math.max(corner.x, maxX), screenWidth));
-				minY = (int) Math.round(Math.max(Math.min(corner.y, minY), 0));
-				maxY = (int) Math.round(Math.min(Math.max(corner.y, maxY), screenHeight));
+				
+				minX = (int) Math.min(corner.x, minX);
+				maxX = (int) Math.max(corner.x, maxX);
+				minY = (int) Math.min(corner.y, minY);
+				maxY = (int) Math.max(corner.y, maxY);
+
 				depth += corner.z;
 			}
 			
+			minX = Math.max(0, minX);
+			maxX = Math.min(screenWidth,  maxX);
+			minY = Math.max(0, minY);
+			maxY = Math.min(screenHeight,  maxY);
+			
 			depth = depth/corners.size();
 			
-			for (int x = minX; x < maxX; x+=scaler) {
-				for (int y = minY; y < maxY; y+=scaler) {
+			for (int x = minX; x < maxX; x++) {
+				for (int y = minY; y < maxY; y++) {
 					Vector2 xyVector = new Vector2(x, y);
 					if (!inPolygon(flatCorners, xyVector)) continue;
 					Double currentEntry = depthPoints[y][x];
-					if ((currentEntry == null || currentEntry > depth) && inPyramid(new Vector3(x - screenWidth/2, y - screenHeight/2, e.z))) {
-//					if ((currentEntry == null || currentEntry > depth)) {
-						for (int i = 0; i < scaler; i++) {
-							for (int j = 0; j < scaler; j++) {						
-								try {									
-									depthPoints[y + i][x + j] = depth;
-									currentView[y + i][x + j] = projectedTris.get(corners);
-								} catch (Exception e) {
-									
-								}
-							}
-						}
+					if (currentEntry == null || currentEntry > depth) {
+						currentView[y][x] = col;
+						depthPoints[y][x] = depth;
 					}
 				}
 			}
@@ -218,7 +211,7 @@ public class ProjectionCalculations {
 	}
 	
 	Boolean inPolygon(List<Vector2> corners, Vector2 point) {
-		if (corners.size() == 3) return inTriangle(point, corners.get(0), corners.get(1), corners.get(2));
+		if (corners.size() == 3) return inTriangle(corners, point);
 		for (Vector2 corner1 : corners) {
 			for (Vector2 corner2 : corners) {
 				if (corner1 == corner2) continue;
@@ -232,19 +225,19 @@ public class ProjectionCalculations {
 	}
 	
 	public Boolean inTriangle(Vector2 point, Vector2 v1, Vector2 v2, Vector2 v3) {
-		float triArea = area(v1, v2, v3);
-		float area1 = area(point, v2, v3);
-		float area2 = area(v1, point, v3);
-		float area3 = area(v1, v2, point);
-		return (Math.abs(triArea - (area1 + area2 + area3)) < 0.1);
+		double triArea = area(v1, v2, v3);
+		double area1 = area(v1, point, v2);
+		double area2 = area(v2, point, v3);
+		double area3 = area(v3, point, v1);
+		return (Math.abs(triArea - (area1 + area2 + area3)) < 10);
 	}
 	
-	public Boolean inTriangle(Vector2 point, Vector2[] vertices) {
-		return inTriangle(point, vertices[0], vertices[1], vertices[2]);
+	public Boolean inTriangle(List<Vector2> vertices, Vector2 point) {
+		return inTriangle(point, vertices.get(0), vertices.get(1), vertices.get(2));
 	}
 	
-	float area(Vector2 t1, Vector2 t2, Vector2 t3) {
-		return (float) Math.abs((t1.x * (t2.y - t3.y) + t2.x * (t3.y - t1.y) + t3.x * (t1.y - t2.y))/2);
+	public static double area(Vector2 t1, Vector2 t2, Vector2 t3) {
+		return Math.abs((t1.x * (t2.y - t3.y) + t2.x * (t3.y - t1.y) + t3.x * (t1.y - t2.y)))/2;
 	}
 	
 	public Vector2 projection2D(Vector3 e, Vector3 d) {

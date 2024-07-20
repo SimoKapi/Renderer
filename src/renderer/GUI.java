@@ -26,8 +26,8 @@ public class GUI extends JPanel {
 	void Update() {
 		label.setText("Rotation: " + Main.camera.rotation.toString() + " Position: " + Main.camera.position.toString());
 		repaint();
-//		resolutionLabel.setText(getWidth() + "x" + getHeight());
-		resolutionLabel.setText(String.valueOf(Main.FOV));
+		resolutionLabel.setText(getWidth() + "x" + getHeight());
+//		resolutionLabel.setText(String.valueOf(Main.FOV));
 	}
 	
 	public void createWindow() {
@@ -69,35 +69,23 @@ public class GUI extends JPanel {
 				
 		BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
 		
-		try {
-			HashMap<Vector2[], Color> points = projectionCalculations.getFinalImage();
-//			HashMap<Vector2, Color> pointsCollection = projectionCalculations.getPointsCollection();
+		HashMap<Vector2[], Color> points = projectionCalculations.getFinalImage();
 			
-			for (int y = 0; y < projectionCalculations.currentView.length - 1; y++) {
-				for (int x = 0; x < projectionCalculations.currentView[y].length - 1; x++) {
-					if (projectionCalculations.currentView[y][x] != null) {						
-						img.setRGB(x, y, projectionCalculations.currentView[y][x].getRGB());
-					}
+		for (int y = 0; y < projectionCalculations.currentView.length - 1; y++) {
+			for (int x = 0; x < projectionCalculations.currentView[y].length - 1; x++) {
+				if (projectionCalculations.currentView[y][x] != null) {						
+					img.setRGB(x, y, projectionCalculations.currentView[y][x].getRGB());
 				}
 			}
+		}
 			
-//			for (Vector2 point : pointsCollection.keySet()) {
-//				g2d.setColor(pointsCollection.get(point));
-//				g2d.drawRect((int) point.x, (int) point.y, 0, 0);
-//			}
-			
-			for (Vector2[] key : points.keySet()) {
-				g2d.setColor(Color.RED);
-				g2d.drawLine((int) key[0].x, (int) key[0].y, (int) key[1].x, (int) key[1].y);
-			}
+//		for (Vector2[] key : points.keySet()) {
+//			g2d.setColor(Color.RED);
+////			g2d.drawLine((int) key[0].x, (int) key[0].y, (int) key[1].x, (int) key[1].y);
+//			g2d.drawRect((int) key[0].x - 4, (int) key[0].y - 4, 8, 8);
+//		}
 	
-			g2d.drawImage(img, 0, 0, null);
-		} catch(Exception e) {}
-		
+		g2d.drawImage(img, 0, 0, null);
 		Main.lateUpdate();
-	}
-			
-	public Vector3 convert(Matrix in) {
-		return new Vector3(in.values[0][0], in.values[1][0], in.values[2][0]);
 	}
 }
