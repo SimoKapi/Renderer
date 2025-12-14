@@ -19,9 +19,10 @@ public class Main {
 	public static long deltaTime;
 	public static Vector3 inputAxis = new Vector3(0, 0, 0);
 		
-	static String inputFile = "/Users/simo/desktop/test3.stl";
+	static String inputFile = "src/assets/models/tree.stl";
 	
 	public static void main(String[] args) {
+		System.out.println(System.getProperty("user.dir"));
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
 			@Override
 			public boolean dispatchKeyEvent(KeyEvent e) {
