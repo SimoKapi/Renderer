@@ -22,7 +22,6 @@ public class Main {
 	static String inputFile = "src/assets/models/tree.stl";
 	
 	public static void main(String[] args) {
-		System.out.println(System.getProperty("user.dir"));
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
 			@Override
 			public boolean dispatchKeyEvent(KeyEvent e) {
