@@ -56,6 +56,17 @@ public class ProjectionCalculations {
 			if (!normalFacingCamera(localVertices)) {
 				continue;
 			}
+
+			Vector3 normal = getNormalVector(localVertices);
+		
+			double angle = Math.cosh((normal.x + normal.y + normal.z)/(Math.sqrt(Math.pow(normal.x, 2) + Math.pow(normal.y, 2) + Math.pow(normal.z, 2))));
+			double multiplier = 0.5*(angle/Math.PI) + 0.5;
+			
+			float red = Math.clamp(Math.round(t.color.getRed() * multiplier), 0, 255);
+			float green = Math.clamp(Math.round(t.color.getGreen() * multiplier), 0, 255);
+			float blue = Math.clamp(Math.round(t.color.getBlue() * multiplier), 0, 255);
+			
+			Color color = new Color(red/255, green/255, blue/255);
 			
 			List<Vector3> trianglePoints = new ArrayList<Vector3>();
 			
@@ -91,7 +102,7 @@ public class ProjectionCalculations {
 					result.put(pointsTuple, t.color);
 				}
 			}
-			projectedTris.put(trianglePoints, t.color);
+			projectedTris.put(trianglePoints, color);
 		}
 		pointsCollection = calculateRenderPoints(projectedTris);
 		return result;
