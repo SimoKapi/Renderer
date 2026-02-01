@@ -18,9 +18,9 @@ public class Main {
 	static STL_Loader stlLoader = new STL_Loader();
 	public static long deltaTime;
 	public static Vector3 inputAxis = new Vector3(0, 0, 0);
-	public static Vector3 lightVector = new Vector3(0, -1, 0);
+	public static Vector3 lightVector = new Vector3(1, -1, 0);
 		
-	static String inputFile = "src/assets/models/car.stl";
+	static String inputFile = "src/assets/models/bucket.stl";
 	
 	public static void main(String[] args) {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
