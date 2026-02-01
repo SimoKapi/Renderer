@@ -8,7 +8,9 @@ A lightweight, from-scratch 3D graphics engine built in Java. This project imple
 * **Linear Algebra Engine:** Implemented custom matrix transformations to handle translation, rotation (Euler angles), and scaling in 3D space.
 * **Backface Culling:** An optimization technique that discards surfaces facing away from the camera. By calculating the dot product between the surface normal and the camera’s view vector, the engine skips the rendering of roughly 50% of the polygons in a closed mesh.
 * **Perspective Projection:** Utilized a projection matrix to simulate depth, mapping 3D coordinates into a 2D viewing frustum.
-* **Depth perception:** Simple shading was implemented, multiplying the color of each face by a coefficient determined by the ratio of the angle of the normal vector to the camera's forward vector.
+* **Depth perception:** Flat shading was implemented, multiplying the color of each face by a coefficient determined by the ratio of the angle of the normal vector to the camera's forward vector.
+
+* A more in-depth description is on [my website](https://simokapi.com/projects/rasterizer)
 
 ---
 
