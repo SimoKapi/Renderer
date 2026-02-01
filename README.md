@@ -1,5 +1,7 @@
 # Java 3D STL Renderer
 
+![Bucket render demo](bucket.png)
+
 A lightweight, from-scratch 3D graphics engine built in Java. This project implements the full rendering pipeline—from parsing raw vertex data to projecting 3D coordinates onto a 2D screen—without the use of external 3D libraries like OpenGL.
 
 ## Technical Features
