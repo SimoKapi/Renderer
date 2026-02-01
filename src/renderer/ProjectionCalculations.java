@@ -57,10 +57,10 @@ public class ProjectionCalculations {
 				continue;
 			}
 
-			Vector3 normal = getNormalVector(localVertices);
-		
-			double angle = Math.cosh((normal.x + normal.y + normal.z)/(Math.sqrt(Math.pow(normal.x, 2) + Math.pow(normal.y, 2) + Math.pow(normal.z, 2))));
-			double multiplier = 0.5*(angle/Math.PI) + 0.5;
+			Vector3 normal = getNormalVector(new Vector3[] {t.v1, t.v2, t.v3});
+
+			double angle = Math.cosh((normal.x * Main.lightVector.x + normal.y * Main.lightVector.y + normal.z * Main.lightVector.z)/(Math.sqrt(Math.pow(normal.x, 2) + Math.pow(normal.y, 2) + Math.pow(normal.z, 2)) * Math.sqrt(Math.pow(Main.lightVector.x, 2) + Math.pow(Main.lightVector.y, 2) + Math.pow(Main.lightVector.z, 2))));
+			double multiplier = 0.9*(angle/Math.PI) + 0.1;
 			
 			float red = Math.clamp(Math.round(t.color.getRed() * multiplier), 0, 255);
 			float green = Math.clamp(Math.round(t.color.getGreen() * multiplier), 0, 255);
