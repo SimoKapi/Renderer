@@ -18,7 +18,7 @@ public class Main {
 	static STL_Loader stlLoader = new STL_Loader();
 	public static long deltaTime;
 	public static Vector3 inputAxis = new Vector3(0, 0, 0);
-	public static Vector3 lightVector = new Vector3(100, 100, 0);
+	public static Vector3 lightVector = new Vector3(100, 000, 0);
 		
 	static String inputFile = "src/assets/models/tree.stl";
 	
