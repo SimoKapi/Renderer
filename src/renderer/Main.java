@@ -11,16 +11,16 @@ public class Main {
 	public static int frameRate = 50;
 	public static double FOV = 10;
 	static List<Triangle> tris = new ArrayList<Triangle>();
-	public static Camera camera = new Camera(new Vector3(0, 0, -10), Vector3.zero, new Vector2(1920, 1080));
+	public static Camera camera = new Camera(new Vector3(0, 0, -10), new Vector3(0, 0, 0), new Vector2(1920, 1080));
 	public static GUI panel;
 	static CameraMovement cameraMovement = new CameraMovement();
 	static CameraRotation cameraRotation = new CameraRotation();
 	static STL_Loader stlLoader = new STL_Loader();
 	public static long deltaTime;
 	public static Vector3 inputAxis = new Vector3(0, 0, 0);
-	public static Vector3 lightVector = new Vector3(100, 000, 0);
+	public static Vector3 lightVector = new Vector3(0, -1, 0);
 		
-	static String inputFile = "src/assets/models/tree.stl";
+	static String inputFile = "src/assets/models/car.stl";
 	
 	public static void main(String[] args) {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
